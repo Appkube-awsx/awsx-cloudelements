@@ -1,4 +1,4 @@
-- [What is AWSX](#awsx-cloudelements)
+- [What is awsx-cloudelements](#awsx-cloudelements)
 - [How to write plugin subcommand](#how-to-write-plugin-subcommand)
 - [How to build / Test](#how-to-build--test)
 - [what it does ](#what-it-does)
