@@ -1,22 +1,40 @@
-# GO CLI **getElementDetails**
-    This documentation provides help to create go cli getElementDetails and publish it to git as independent module. 
+- [What is AWSX](#awsx-cloudelements)
+- [How to write plugin subcommand](#how-to-write-plugin-subcommand)
+- [How to build / Test](#how-to-build--test)
+- [what it does ](#what-it-does)
+- [command input](#command-input)
+- [command output](#command-output)
+- [How to run ](#how-to-run)
 
-    getElementDetails --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
-    
+# awsx-cloudelements
+This is a plugin subcommand for awsx cli ( https://github.com/Appkube-awsx/awsx#awsx ) cli.
 
-# Command structure
-    getElementDetails  --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
-    
-> Command \
-    **getElementDetails**: getElementDetails command will get the resource count summary for a given AWS account id and regions 
-    
-> Command Parameters \
-    **--vaultURL**: It is a server url and used to store user cloud credentials. It stores information in key=value pair in encrypted format. \
-    **--accountId**: It is a AWS account id. We pass this account id as key to the vault serve to get user credentials \
-    **--zone**: This parameter is the AWS region
+# How to write plugin subcommand 
+Please refer to the instaruction -
+https://github.com/Appkube-awsx/awsx#how-to-write-a-plugin-subcommand
 
-# Response
-    {
+It has detailed instruction on how to write a subcommand plugin , build / test / debug  / publish and integrate into the main commmand.
+
+# How to build / Test
+            go run main.go
+                - Program will print Calling aws-cloudelements on console 
+
+            Another way of testing is by running go install command
+            go install
+            - go install command creates an exe with the name of the module (e.g. awsx-cloudelements) and save it in the GOPATH
+            - Now we can execute this command on command prompt as below
+            awsx-cloudelements --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
+
+# what it does 
+This subcommand implement the following functionalities -
+   getElementDetails - It  will get the resource count summary for a given AWS account id and region.
+
+# command input
+  --valutURL = URL location of vault - that stores credentials to call API
+  --acountId = The AWS account id.
+  --zone = AWS region
+#  command output
+{
         ResourceCounts: [
             {
                 Count: 124,
@@ -36,7 +54,12 @@
             }
         ],
         TotalDiscoveredResources: 809
-    }
+}
 
-# [How to create and publish a go module](CREATE_AND_PUBLISH_GO_MODULE.md)
-# [Command Params - Flags](https://dev.to/divrhino/adding-flags-to-a-command-line-tool-built-with-go-and-cobra-34f1)
+# How to run 
+  From main awsx command , it is called as follows:
+  awsx getElementDetails  --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
+  If you build it locally , you can simply run it as standalone command as 
+  awsx-cloudelements --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
+
+
