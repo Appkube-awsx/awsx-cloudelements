@@ -9,6 +9,11 @@
 # awsx-cloudelements
 This is a plugin subcommand for awsx cli ( https://github.com/Appkube-awsx/awsx#awsx ) cli.
 
+For details about awsx commands and how its used in Appkube platform , please refer to the diagram below:
+
+![alt text](https://raw.githubusercontent.com/AppkubeCloud/appkube-architectures/main/LayeredArchitecture.svg)
+
+
 # How to write plugin subcommand 
 Please refer to the instaruction -
 https://github.com/Appkube-awsx/awsx#how-to-write-a-plugin-subcommand
