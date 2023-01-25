@@ -2,8 +2,8 @@ package vault
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -15,24 +15,24 @@ type Response struct {
 }
 
 func GetAccountDetails(vaultUrl string, accountNo string) (*Response, error) {
-	fmt.Println("Calling account details API...")
+	log.Println("Calling account details API")
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", vaultUrl+"?accountNo="+accountNo, nil)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Fatalln(err.Error())
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Print(err.Error())
 		return nil, err
 	}
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Fatalln(err.Error())
 		return nil, err
 	}
 	var responseObject Response

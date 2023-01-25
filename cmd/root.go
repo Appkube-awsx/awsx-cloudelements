@@ -4,71 +4,62 @@ Copyright © 2023 Manoj Sharma manoj.sharma@synectiks.com
 package cmd
 
 import (
-	"fmt"
 	"github.com/Appkube-awsx/awsx-cloudelements/client"
 	"github.com/Appkube-awsx/awsx-cloudelements/vault"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 )
 
 // AwsxCloudElementsCmd represents the base command when called without any subcommands
 var AwsxCloudElementsCmd = &cobra.Command{
-	Use:   "aws-cloudelements",
-	Short: "aws aws-cloudelements details",
-	Long:  `aws aws-cloudelements details`,
+	Use:   "getElementDetails",
+	Short: "getElementDetails command gets resource counts",
+	Long:  `getElementDetails command gets resource counts details of an AWS account`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Calling aws-cloudelements summary api")
+		log.Println("Command getElementDetails started")
 		vaultUrl, _ := cmd.Flags().GetString("vaultUrl")
-		accountNo, _ := cmd.Flags().GetString("ac")
-		region, _ := cmd.Flags().GetString("region")
+		accountNo, _ := cmd.Flags().GetString("accountId")
+		region, _ := cmd.Flags().GetString("zone")
 		acKey, _ := cmd.Flags().GetString("accessKey")
 		secKey, _ := cmd.Flags().GetString("secretKey")
 		crossAccountRoleArn, _ := cmd.Flags().GetString("crossAccountRoleArn")
 
-		if accountNo == "" && region == "" && acKey == "" && secKey == "" && crossAccountRoleArn == "" {
-			fmt.Println("AWS credentials like account number or accesskey/secretkey/region/crossAccountRoleArn not provided")
-			return
-		}
-
-		if vaultUrl != "" {
-			if accountNo == "" {
-				fmt.Println("AWS account number not provided")
+		if vaultUrl != "" && accountNo != "" {
+			if region == "" {
+				log.Fatalln("Zone not provided. Program exit")
 				return
 			}
-			fmt.Println("Account number provided. Calling API to get account details")
-			// call rest api to get accesGetAccountDetailssKey/secretKey/crossAccountRoleArn/region
+			log.Println("Getting account details")
 			data, err := vault.GetAccountDetails(vaultUrl, accountNo)
 			if err != nil {
-				fmt.Println("Error while calling the account details api. Error ", err)
+				log.Println("Error in calling the account details api. \n", err)
 				return
 			}
-			if data.AccessKey == "" {
-				log.Println("Account credentials not found.")
+			if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" {
+				log.Println("Account details not found.")
 				return
 			}
-			getConfigResources(data.Region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey)
-		} else {
-			if region == "" || acKey == "" || secKey == "" || crossAccountRoleArn == "" {
-				fmt.Println("AWS credentials like accesskey/secretkey/region/crossAccountRoleArn not provided")
-				return
-			}
-			fmt.Println("Getting aws appconfig summary")
+			getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey)
+		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" {
 			getConfigResources(region, crossAccountRoleArn, acKey, secKey)
+		} else {
+			log.Fatal("AWS credentials like accesskey/secretkey/region/crossAccountRoleArn not provided. Program exit")
+			return
 		}
 
 	},
 }
 
 func getConfigResources(region string, crossAccountRoleArn string, accessKey string, secretKey string) *configservice.GetDiscoveredResourceCountsOutput {
+	log.Println("Getting aws config resource count summary")
 	configServiceClient := client.GetClient(region, crossAccountRoleArn, accessKey, secretKey)
 	configResourceRequest := &configservice.GetDiscoveredResourceCountsInput{}
 	configResourceResponse, err := configServiceClient.GetDiscoveredResourceCounts(configResourceRequest)
 	if err != nil {
-		log.Fatal("Error: ", err)
+		log.Fatalln("Error: ", err)
 	}
 	log.Println(configResourceResponse)
 	return configResourceResponse
@@ -84,14 +75,14 @@ func Execute() {
 	err := AwsxCloudElementsCmd.Execute()
 	if err != nil {
 		log.Fatal("There was some error while executing the CLI: ", err)
-		os.Exit(1)
+		return
 	}
 }
 
 func init() {
 	AwsxCloudElementsCmd.Flags().String("vaultUrl", "", "vault end point")
-	AwsxCloudElementsCmd.Flags().String("ac", "", "aws account number")
-	AwsxCloudElementsCmd.Flags().String("region", "", "aws region")
+	AwsxCloudElementsCmd.Flags().String("accountId", "", "aws account number")
+	AwsxCloudElementsCmd.Flags().String("zone", "", "aws region")
 	AwsxCloudElementsCmd.Flags().String("accessKey", "", "aws access key")
 	AwsxCloudElementsCmd.Flags().String("secretKey", "", "aws secret key")
 	AwsxCloudElementsCmd.Flags().String("crossAccountRoleArn", "", "aws cross account role arn")
