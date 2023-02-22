@@ -16,10 +16,8 @@ var AwsxCloudElementsCmd = &cobra.Command{
 	Use:   "getElementDetails",
 	Short: "getElementDetails command gets resource counts",
 	Long:  `getElementDetails command gets resource counts details of an AWS account`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println("Command getElementDetails started")
 		vaultUrl, _ := cmd.Flags().GetString("vaultUrl")
 		accountNo, _ := cmd.Flags().GetString("accountId")
 		region, _ := cmd.Flags().GetString("zone")
@@ -29,7 +27,7 @@ var AwsxCloudElementsCmd = &cobra.Command{
 
 		if vaultUrl != "" && accountNo != "" {
 			if region == "" {
-				log.Fatalln("Zone not provided. Program exit")
+				cmd.Help()
 				return
 			}
 			log.Println("Getting account details")
@@ -46,7 +44,7 @@ var AwsxCloudElementsCmd = &cobra.Command{
 		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" {
 			getConfigResources(region, crossAccountRoleArn, acKey, secKey)
 		} else {
-			log.Fatal("AWS credentials like accesskey/secretkey/region/crossAccountRoleArn not provided. Program exit")
+			cmd.Help()
 			return
 		}
 
