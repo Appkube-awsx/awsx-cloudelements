@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/Appkube-awsx/awsx-cloudelements/client"
+	"github.com/Appkube-awsx/awsx-cloudelements/util"
 	"github.com/Appkube-awsx/awsx-cloudelements/vault"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/spf13/cobra"
@@ -24,7 +25,8 @@ var AwsxCloudElementsCmd = &cobra.Command{
 		acKey, _ := cmd.Flags().GetString("accessKey")
 		secKey, _ := cmd.Flags().GetString("secretKey")
 		crossAccountRoleArn, _ := cmd.Flags().GetString("crossAccountRoleArn")
-
+		externalId, _ := cmd.Flags().GetString("externalId")
+		sessionName := util.StringWithCharset(5, util.CHARSET)
 		if vaultUrl != "" && accountNo != "" {
 			if region == "" {
 				cmd.Help()
@@ -40,9 +42,9 @@ var AwsxCloudElementsCmd = &cobra.Command{
 				log.Println("Account details not found.")
 				return
 			}
-			getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey)
+			getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey, sessionName, data.ExternalId)
 		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" {
-			getConfigResources(region, crossAccountRoleArn, acKey, secKey)
+			getConfigResources(region, crossAccountRoleArn, acKey, secKey, sessionName, externalId)
 		} else {
 			cmd.Help()
 			return
@@ -51,20 +53,30 @@ var AwsxCloudElementsCmd = &cobra.Command{
 	},
 }
 
-func getConfigResources(region string, crossAccountRoleArn string, accessKey string, secretKey string) *configservice.GetDiscoveredResourceCountsOutput {
+func getConfigResources(region string, crossAccountRoleArn string, accessKey string, secretKey string, sessionName string, externalId string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	log.Println("Getting aws config resource count summary")
-	configServiceClient := client.GetClient(region, crossAccountRoleArn, accessKey, secretKey)
+	configServiceClient, err := client.GetClient(region, crossAccountRoleArn, accessKey, secretKey, sessionName, externalId)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
 	configResourceRequest := &configservice.GetDiscoveredResourceCountsInput{}
 	configResourceResponse, err := configServiceClient.GetDiscoveredResourceCounts(configResourceRequest)
 	if err != nil {
-		log.Fatalln("Error: ", err)
+		log.Println(err.Error())
+		return nil, err
 	}
 	log.Println(configResourceResponse)
-	return configResourceResponse
+	return configResourceResponse, nil
 }
 
-func GetConfig(region string, crossAccountRoleArn string, accessKey string, secretKey string) *configservice.GetDiscoveredResourceCountsOutput {
-	return getConfigResources(region, crossAccountRoleArn, accessKey, secretKey)
+func GetConfig(region string, crossAccountRoleArn string, accessKey string, secretKey string, externalId string) *configservice.GetDiscoveredResourceCountsOutput {
+	response, err := getConfigResources(region, crossAccountRoleArn, accessKey, secretKey, "", externalId)
+	if err != nil {
+		log.Println(err.Error())
+		return nil
+	}
+	return response
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -84,4 +96,5 @@ func init() {
 	AwsxCloudElementsCmd.Flags().String("accessKey", "", "aws access key")
 	AwsxCloudElementsCmd.Flags().String("secretKey", "", "aws secret key")
 	AwsxCloudElementsCmd.Flags().String("crossAccountRoleArn", "", "aws cross account role arn")
+	AwsxCloudElementsCmd.Flags().String("externalId", "", "aws external id")
 }

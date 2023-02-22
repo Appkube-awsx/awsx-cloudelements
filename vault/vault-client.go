@@ -12,6 +12,7 @@ type Response struct {
 	AccessKey           string `json:"accessKey,omitempty"`
 	SecretKey           string `json:"secretKey,omitempty"`
 	CrossAccountRoleArn string `json:"crossAccountRoleArn,omitempty"`
+	ExternalId          string `json:"externalId,omitempty"`
 }
 
 func GetAccountDetails(vaultUrl string, accountNo string) (*Response, error) {
@@ -19,20 +20,20 @@ func GetAccountDetails(vaultUrl string, accountNo string) (*Response, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", vaultUrl+"?accountNo="+accountNo, nil)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Print(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 	var responseObject Response
