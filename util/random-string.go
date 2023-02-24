@@ -8,13 +8,12 @@ import (
 const CHARSET = "abcdefghijklmnopqrstuvwxyz" +
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func StringWithCharset(length int, charset string) string {
+func RamdomString(length int) string {
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset))]
+		b[i] = CHARSET[seededRand.Intn(len(CHARSET))]
 	}
 	return string(b)
 }
 
-var seededRand *rand.Rand = rand.New(
-	rand.NewSource(time.Now().UnixNano()))
+var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))

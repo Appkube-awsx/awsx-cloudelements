@@ -26,7 +26,7 @@ var AwsxCloudElementsCmd = &cobra.Command{
 		secKey, _ := cmd.Flags().GetString("secretKey")
 		crossAccountRoleArn, _ := cmd.Flags().GetString("crossAccountRoleArn")
 		externalId, _ := cmd.Flags().GetString("externalId")
-		sessionName := util.StringWithCharset(5, util.CHARSET)
+		sessionName := util.RamdomString(5)
 		if vaultUrl != "" && accountNo != "" {
 			if region == "" {
 				cmd.Help()
@@ -38,12 +38,12 @@ var AwsxCloudElementsCmd = &cobra.Command{
 				log.Println("Error in calling the account details api. \n", err)
 				return
 			}
-			if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" {
+			if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" || data.ExternalId == "" {
 				log.Println("Account details not found.")
 				return
 			}
 			getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey, sessionName, data.ExternalId)
-		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" {
+		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" && externalId != "" {
 			getConfigResources(region, crossAccountRoleArn, acKey, secKey, sessionName, externalId)
 		} else {
 			cmd.Help()
@@ -71,7 +71,8 @@ func getConfigResources(region string, crossAccountRoleArn string, accessKey str
 }
 
 func GetConfig(region string, crossAccountRoleArn string, accessKey string, secretKey string, externalId string) *configservice.GetDiscoveredResourceCountsOutput {
-	response, err := getConfigResources(region, crossAccountRoleArn, accessKey, secretKey, "", externalId)
+	sessionName := util.RamdomString(5)
+	response, err := getConfigResources(region, crossAccountRoleArn, accessKey, secretKey, sessionName, externalId)
 	if err != nil {
 		log.Println(err.Error())
 		return nil
