@@ -7,7 +7,14 @@ import (
 	"net/http"
 )
 
-type Response struct {
+type AccessCredential struct {
+	Id            int64         `json:"id,omitempty"`
+	CloudType     string        `json:"cloudType,omitempty"`
+	AccountId     string        `json:"accountId,omitempty"`
+	AccessDetails AwsCredential `json:"accessDetails,omitempty"`
+}
+
+type AwsCredential struct {
 	Region              string `json:"region,omitempty"`
 	AccessKey           string `json:"accessKey,omitempty"`
 	SecretKey           string `json:"secretKey,omitempty"`
@@ -15,7 +22,7 @@ type Response struct {
 	ExternalId          string `json:"externalId,omitempty"`
 }
 
-func GetAccountDetails(vaultUrl string, accountNo string) (*Response, error) {
+func GetAccountDetails(vaultUrl string, accountNo string) (*AccessCredential, error) {
 	log.Println("Calling account details API")
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", vaultUrl+"?accountNo="+accountNo, nil)
@@ -36,7 +43,7 @@ func GetAccountDetails(vaultUrl string, accountNo string) (*Response, error) {
 		log.Println(err.Error())
 		return nil, err
 	}
-	var responseObject Response
+	var responseObject AccessCredential
 	json.Unmarshal(bodyBytes, &responseObject)
 	//fmt.Printf("API Response as struct %+v\n", responseObject)
 	return &responseObject, nil

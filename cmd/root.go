@@ -38,11 +38,11 @@ var AwsxCloudElementsCmd = &cobra.Command{
 				log.Println("Error in calling the account details api. \n", err)
 				return
 			}
-			if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" || data.ExternalId == "" {
+			if data.AccessDetails.AccessKey == "" || data.AccessDetails.SecretKey == "" || data.AccessDetails.CrossAccountRoleArn == "" || data.AccessDetails.ExternalId == "" {
 				log.Println("Account details not found.")
 				return
 			}
-			getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey, sessionName, data.ExternalId)
+			getConfigResources(region, data.AccessDetails.CrossAccountRoleArn, data.AccessDetails.AccessKey, data.AccessDetails.SecretKey, sessionName, data.AccessDetails.ExternalId)
 		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" && externalId != "" {
 			getConfigResources(region, crossAccountRoleArn, acKey, secKey, sessionName, externalId)
 		} else {
