@@ -22,10 +22,10 @@ type AwsCredential struct {
 	ExternalId          string `json:"externalId,omitempty"`
 }
 
-func GetAccountDetails(vaultUrl string, accountNo string) (*AccessCredential, error) {
+func GetAccountDetails(vaultUrl string, accountNo string) (*AwsCredential, error) {
 	log.Println("Calling account details API")
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", vaultUrl+"?accountNo="+accountNo, nil)
+	req, err := http.NewRequest("GET", vaultUrl+"/"+accountNo, nil)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -43,7 +43,7 @@ func GetAccountDetails(vaultUrl string, accountNo string) (*AccessCredential, er
 		log.Println(err.Error())
 		return nil, err
 	}
-	var responseObject AccessCredential
+	var responseObject AwsCredential
 	json.Unmarshal(bodyBytes, &responseObject)
 	//fmt.Printf("API Response as struct %+v\n", responseObject)
 	return &responseObject, nil
