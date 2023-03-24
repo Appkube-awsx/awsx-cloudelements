@@ -38,7 +38,6 @@ var AwsxCloudElementsCmd = &cobra.Command{
 				log.Println("Error in calling the account details api. \n", err)
 				return
 			}
-
 			if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" || data.ExternalId == "" {
 				log.Println("Account details not found.")
 				return
