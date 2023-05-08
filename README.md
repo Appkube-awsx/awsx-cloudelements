@@ -11,7 +11,7 @@ This is a plugin subcommand for awsx cli ( https://github.com/Appkube-awsx/awsx#
 
 For details about awsx commands and how its used in Appkube platform , please refer to the diagram below:
 
-![alt text](https://raw.githubusercontent.com/AppkubeCloud/appkube-architectures/main/LayeredArchitecture.svg)
+![alt text](https://raw.githubusercontent.com/AppkubeCloud/appkube-architectures/main/LayeredArchitecture-phase2.svg)
 
 
 # How to write plugin subcommand 
