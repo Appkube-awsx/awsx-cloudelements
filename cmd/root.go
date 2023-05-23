@@ -4,6 +4,7 @@ Copyright © 2023 Manoj Sharma manoj.sharma@synectiks.com
 package cmd
 
 import (
+	"fmt"
 	"github.com/Appkube-awsx/awsx-cloudelements/client"
 	"github.com/Appkube-awsx/awsx-cloudelements/util"
 	"github.com/Appkube-awsx/awsx-cloudelements/vault"
@@ -29,20 +30,11 @@ var AwsxCloudElementsCmd = &cobra.Command{
 		sessionName := util.RamdomString(5)
 		if vaultUrl != "" && accountNo != "" {
 			if region == "" {
+				log.Println("zone missing")
 				cmd.Help()
 				return
 			}
-			log.Println("Getting account details")
-			data, err := vault.GetAccountDetails(vaultUrl, accountNo)
-			if err != nil {
-				log.Println("Error in calling the account details api. \n", err)
-				return
-			}
-			if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" || data.ExternalId == "" {
-				log.Println("Account details not found.")
-				return
-			}
-			getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey, sessionName, data.ExternalId)
+			GetCloudConfigSummary(region, vaultUrl, accountNo)
 		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" && externalId != "" {
 			getConfigResources(region, crossAccountRoleArn, acKey, secKey, sessionName, externalId)
 		} else {
@@ -70,14 +62,41 @@ func getConfigResources(region string, crossAccountRoleArn string, accessKey str
 	return configResourceResponse, nil
 }
 
-func GetConfig(region string, crossAccountRoleArn string, accessKey string, secretKey string, externalId string) *configservice.GetDiscoveredResourceCountsOutput {
+func GetConfig(region string, crossAccountRoleArn string, accessKey string, secretKey string, externalId string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	sessionName := util.RamdomString(5)
 	response, err := getConfigResources(region, crossAccountRoleArn, accessKey, secretKey, sessionName, externalId)
 	if err != nil {
 		log.Println(err.Error())
-		return nil
+		return nil, fmt.Errorf("failed to load config summary. %v", err)
 	}
-	return response
+	return response, nil
+}
+
+func GetCloudConfigSummary(region string, vaultUrl string, accountNo string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+	if region == "" {
+		log.Println("region is missing")
+		return nil, fmt.Errorf("region is missing")
+	} else if vaultUrl == "" {
+		log.Println("vault url is missing")
+		return nil, fmt.Errorf("vault url is missing")
+	} else if accountNo == "" {
+		log.Println("account no is missing ")
+		return nil, fmt.Errorf("account no is missing")
+	}
+	log.Println("Getting account details")
+	data, err := vault.GetAccountDetails(vaultUrl, accountNo)
+	if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" || data.ExternalId == "" {
+		log.Println("Account details not found")
+		return nil, err
+	}
+	sessionName := util.RamdomString(5)
+	response, err := getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey, sessionName, data.ExternalId)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return response, nil
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

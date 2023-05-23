@@ -21,8 +21,8 @@ https://github.com/Appkube-awsx/awsx#how-to-write-a-plugin-subcommand
 It has detailed instruction on how to write a subcommand plugin , build / test / debug  / publish and integrate into the main commmand.
 
 # How to build / Test
-            go run main.go
-                - Program will print Calling aws-cloudelements on console 
+            go run .\main.go  getElementDetails --vaultUrl=http://34.199.12.114:6067/api/vault/accountId --accountId=456262373 --zone=us-east-1 
+                - Program will print output json 
 
             Another way of testing is by running go install command
             go install
