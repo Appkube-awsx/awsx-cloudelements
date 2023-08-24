@@ -21,6 +21,7 @@ var AwsxCloudElementsCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		vaultUrl, _ := cmd.Flags().GetString("vaultUrl")
+		vaultToken, _ := cmd.Flags().GetString("vaultToken")
 		accountNo, _ := cmd.Flags().GetString("accountId")
 		region, _ := cmd.Flags().GetString("zone")
 		acKey, _ := cmd.Flags().GetString("accessKey")
@@ -34,7 +35,12 @@ var AwsxCloudElementsCmd = &cobra.Command{
 				cmd.Help()
 				return
 			}
-			GetCloudConfigSummary(region, vaultUrl, accountNo)
+			if vaultToken == "" {
+				log.Println("vault token missing")
+				cmd.Help()
+				return
+			}
+			GetCloudConfigSummary(region, vaultUrl, vaultToken, accountNo)
 		} else if region != "" && acKey != "" && secKey != "" && crossAccountRoleArn != "" && externalId != "" {
 			getConfigResources(region, crossAccountRoleArn, acKey, secKey, sessionName, externalId)
 		} else {
@@ -72,7 +78,7 @@ func GetConfig(region string, crossAccountRoleArn string, accessKey string, secr
 	return response, nil
 }
 
-func GetCloudConfigSummary(region string, vaultUrl string, accountNo string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+func GetCloudConfigSummary(region string, vaultUrl string, vaultToken string, accountNo string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	if region == "" {
 		log.Println("region is missing")
 		return nil, fmt.Errorf("region is missing")
@@ -82,15 +88,18 @@ func GetCloudConfigSummary(region string, vaultUrl string, accountNo string) (*c
 	} else if accountNo == "" {
 		log.Println("account no is missing ")
 		return nil, fmt.Errorf("account no is missing")
+	} else if vaultToken == "" {
+		log.Println("vault token is missing ")
+		return nil, fmt.Errorf("vault token is missing")
 	}
 	log.Println("Getting account details")
-	data, err := vault.GetAccountDetails(vaultUrl, accountNo)
-	if data.AccessKey == "" || data.SecretKey == "" || data.CrossAccountRoleArn == "" || data.ExternalId == "" {
+	vaultResp, err := vault.GetAccountDetails(vaultUrl, vaultToken, accountNo)
+	if vaultResp.Data.AccessKey == "" || vaultResp.Data.SecretKey == "" || vaultResp.Data.CrossAccountRoleArn == "" || vaultResp.Data.ExternalId == "" {
 		log.Println("Account details not found")
 		return nil, err
 	}
 	sessionName := util.RamdomString(5)
-	response, err := getConfigResources(region, data.CrossAccountRoleArn, data.AccessKey, data.SecretKey, sessionName, data.ExternalId)
+	response, err := getConfigResources(region, vaultResp.Data.CrossAccountRoleArn, vaultResp.Data.AccessKey, vaultResp.Data.SecretKey, sessionName, vaultResp.Data.ExternalId)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -111,6 +120,7 @@ func Execute() {
 
 func init() {
 	AwsxCloudElementsCmd.Flags().String("vaultUrl", "", "vault end point")
+	AwsxCloudElementsCmd.Flags().String("vaultToken", "", "vault token")
 	AwsxCloudElementsCmd.Flags().String("accountId", "", "aws account number")
 	AwsxCloudElementsCmd.Flags().String("zone", "", "aws region")
 	AwsxCloudElementsCmd.Flags().String("accessKey", "", "aws access key")

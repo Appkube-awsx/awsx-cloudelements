@@ -7,13 +7,6 @@ import (
 	"net/http"
 )
 
-type AccessCredential struct {
-	Id            int64         `json:"id,omitempty"`
-	CloudType     string        `json:"cloudType,omitempty"`
-	AccountId     string        `json:"accountId,omitempty"`
-	AccessDetails AwsCredential `json:"accessDetails,omitempty"`
-}
-
 type AwsCredential struct {
 	Region              string `json:"region,omitempty"`
 	AccessKey           string `json:"accessKey,omitempty"`
@@ -22,7 +15,15 @@ type AwsCredential struct {
 	ExternalId          string `json:"externalId,omitempty"`
 }
 
-func GetAccountDetails(vaultUrl string, accountNo string) (*AwsCredential, error) {
+type VaultResponse struct {
+	RequestId     string        `json:"request_id,omitempty"`
+	LeaseId       string        `json:"lease_id,omitempty"`
+	Renewable     string        `json:"renewable,omitempty"`
+	LeaseDuration int64         `json:"lease_duration,omitempty"`
+	Data          AwsCredential `json:"data,omitempty"`
+}
+
+func GetAccountDetails(vaultUrl string, vaultToken string, accountNo string) (*VaultResponse, error) {
 	log.Println("Calling account details API")
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", vaultUrl+"/"+accountNo, nil)
@@ -32,6 +33,7 @@ func GetAccountDetails(vaultUrl string, accountNo string) (*AwsCredential, error
 	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("X-Vault-Token", vaultToken)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err.Error())
@@ -43,7 +45,7 @@ func GetAccountDetails(vaultUrl string, accountNo string) (*AwsCredential, error
 		log.Println(err.Error())
 		return nil, err
 	}
-	var responseObject AwsCredential
+	var responseObject VaultResponse
 	json.Unmarshal(bodyBytes, &responseObject)
 	//fmt.Printf("API Response as struct %+v\n", responseObject)
 	return &responseObject, nil
