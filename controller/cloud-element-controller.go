@@ -27,7 +27,7 @@ func getAppconfig(authFlag bool, clientAuth *client.Auth, err error) (*configser
 		log.Println(err.Error())
 		return nil, err
 	}
-	response, err := appconfigcmd.GetDiscoveredResourceCounts(clientAuth.Region, clientAuth.CrossAccountRoleArn, clientAuth.AccessKey, clientAuth.SecretKey, clientAuth.ExternalId)
+	response, err := appconfigcmd.GetDiscoveredResourceCounts(*clientAuth)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
