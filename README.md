@@ -21,23 +21,35 @@ https://github.com/Appkube-awsx/awsx#how-to-write-a-plugin-subcommand
 It has detailed instruction on how to write a subcommand plugin , build / test / debug  / publish and integrate into the main commmand.
 
 # How to build / Test
-            go run .\main.go  getElementDetails --vaultUrl=http://34.199.12.114:6067/api/vault/accountId --accountId=456262373 --zone=us-east-1 
-                - Program will print output json 
+            - With Vault URL    
+            go run .\main.go --zone=us-east-1 --vaultUrl=http://<server-address>:<port>/v1/kv-v1 --accountId=SYNECTIKS/HR/AWS/1111111111 --vaultToken=xxxxxxxxxx
+            or
+            go run .\main.go getElementDetails --zone=us-east-1 --vaultUrl=http://<server-address>:<port>/v1/kv-v1 --accountId=SYNECTIKS/HR/AWS/111111111 --vaultToken=xxxxxxxxxx
+            
+            - With Access/Secret key
+            go run .\main.go --zone=us-east-1 --accessKey=######### --secretKey=######### --externalId=######### --crossAccountRoleArn=#########
+            or
+            go run .\main.go  getElementDetails --zone=us-east-1 --accessKey=######### --secretKey=######### --externalId=######### --crossAccountRoleArn=#########
 
             Another way of testing is by running go install command
             go install
             - go install command creates an exe with the name of the module (e.g. awsx-cloudelements) and save it in the GOPATH
             - Now we can execute this command on command prompt as below
-            awsx-cloudelements --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
+            - With Vault URL    
+            awsx-cloudelements --zone=us-east-1 --vaultUrl=http://<server-address>:<port>/v1/kv-v1 --accountId=SYNECTIKS/HR/AWS/111111111 --vaultToken=xxxxxxxxxx
+            - With Access/Secret key
+            awsx-cloudelements --zone=us-east-1 --accessKey=######### --secretKey=######### --externalId=######### --crossAccountRoleArn=#########
 
 # what it does 
-This subcommand implement the following functionalities -
-   getElementDetails - It  will get the resource count summary for a given AWS account id and region.
+This subcommand implement the following functionalities
+  - getElementDetails - It  will get the resource count summary for a given AWS account id
 
 # command input
-  --valutURL = URL location of vault - that stores credentials to call API
-  --acountId = The AWS account id.
-  --zone = AWS region
+  - valutURL = URL location of vault - that stores credentials to call API
+  - acountId = The AWS account id.
+  - zone = AWS region
+  - vaultToken = Vault token to access vault
+
 #  command output
 {
         ResourceCounts: [
@@ -58,13 +70,19 @@ This subcommand implement the following functionalities -
                 ResourceType: "AWS::CloudWatch::Alarm"
             }
         ],
-        TotalDiscoveredResources: 809
+        TotalDiscoveredResources: 367
 }
 
 # How to run 
-  From main awsx command , it is called as follows:
-  awsx getElementDetails  --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
-  If you build it locally , you can simply run it as standalone command as 
-  awsx-cloudelements --vaultURL=vault.dummy.net --accountId=xxxxxxxxxx --zone=us-west-2
+From main awsx command , it is called as follows:
+  - awsx getElementDetails  --zone=us-east-1 --vaultUrl=http://<server-address>:<port>/v1/kv-v1 --accountId=SYNECTIKS/HR/AWS/1111111111 --vaultToken=xxxxxxxxxx
+  
+    OR
+  - awsx getElementDetails  --zone=us-east-1 --accessKey=######### --secretKey=######### --externalId=######### --crossAccountRoleArn=#########
 
+If you build it locally , you can simply run it as standalone command as 
+  - awsx-cloudelements --zone=us-east-1 --vaultUrl=http://<server-address>:<port>/v1/kv-v1 --accountId=SYNECTIKS/HR/AWS/1111111111 --vaultToken=xxxxxxxxxx
+
+    OR
+  - awsx-cloudelements  --zone=us-east-1 --accessKey=######### --secretKey=######### --externalId=######### --crossAccountRoleArn=#########
 
