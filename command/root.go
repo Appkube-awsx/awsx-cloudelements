@@ -23,7 +23,7 @@ var AwsxCloudElementsCmd = &cobra.Command{
 			return
 		}
 		if authFlag {
-			appconfigcmd.GetDiscoveredResourceCounts(clientAuth.Region, clientAuth.CrossAccountRoleArn, clientAuth.AccessKey, clientAuth.SecretKey, clientAuth.ExternalId)
+			appconfigcmd.GetDiscoveredResourceCounts(*clientAuth)
 		} else {
 			cmd.Help()
 			return

@@ -1,18 +1,14 @@
 package appconfigcmd
 
 import (
-	"github.com/Appkube-awsx/awsx-cloudelements/client"
+	"github.com/Appkube-awsx/awsx-common/client"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"log"
 )
 
-func GetDiscoveredResourceCounts(region string, crossAccountRoleArn string, accessKey string, secretKey string, externalId string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+func GetDiscoveredResourceCounts(auth client.Auth) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	log.Println("Getting aws config resource count summary")
-	configServiceClient, err := client.GetClient(region, crossAccountRoleArn, accessKey, secretKey, externalId)
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
+	configServiceClient := client.GetClient(auth, client.CONFIG_SERVICE_CLIENT).(*configservice.ConfigService)
 	configResourceRequest := &configservice.GetDiscoveredResourceCountsInput{}
 	configResourceResponse, err := configServiceClient.GetDiscoveredResourceCounts(configResourceRequest)
 	if err != nil {
