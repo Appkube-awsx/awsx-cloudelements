@@ -4,8 +4,8 @@ Copyright © 2023 Manoj Sharma manoj.sharma@synectiks.com
 package command
 
 import (
-	"github.com/Appkube-awsx/awsx-cloudelements/authenticate"
 	"github.com/Appkube-awsx/awsx-cloudelements/command/appconfigcmd"
+	"github.com/Appkube-awsx/awsx-common/authenticate"
 	"github.com/spf13/cobra"
 	"log"
 )

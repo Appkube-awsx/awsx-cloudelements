@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/Appkube-awsx/awsx-cloudelements/authenticate"
 	"github.com/Appkube-awsx/awsx-cloudelements/command/appconfigcmd"
+	"github.com/Appkube-awsx/awsx-common/authenticate"
 	"github.com/Appkube-awsx/awsx-common/client"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"log"
