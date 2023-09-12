@@ -10,15 +10,15 @@ import (
 
 func GetDiscoveredResourceByAccountNo(vaultUrl string, vaultToken string, accountNo string, region string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	authFlag, clientAuth, err := authenticate.AuthenticateData(vaultUrl, vaultToken, accountNo, region, "", "", "", "")
-	return getAppconfig(authFlag, clientAuth, err)
+	return GetDiscoveredResource(authFlag, clientAuth, err)
 }
 
 func GetDiscoveredResourceByUserCreds(region string, accesskey string, secretKey string, crossAccountRoleArn string, externalId string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	authFlag, clientAuth, err := authenticate.AuthenticateData("", "", "", region, accesskey, secretKey, crossAccountRoleArn, externalId)
-	return getAppconfig(authFlag, clientAuth, err)
+	return GetDiscoveredResource(authFlag, clientAuth, err)
 }
 
-func getAppconfig(authFlag bool, clientAuth *client.Auth, err error) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+func GetDiscoveredResource(authFlag bool, clientAuth *client.Auth, err error) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
