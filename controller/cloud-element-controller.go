@@ -10,15 +10,15 @@ import (
 
 func GetDiscoveredResourceByAccountNo(vaultUrl string, vaultToken string, accountNo string, region string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	authFlag, clientAuth, err := authenticate.AuthenticateData(vaultUrl, vaultToken, accountNo, region, "", "", "", "")
-	return GetDiscoveredResource(authFlag, clientAuth, err)
+	return GetDiscoveredResourceByFlagAndClientAuth(authFlag, clientAuth, err)
 }
 
 func GetDiscoveredResourceByUserCreds(region string, accesskey string, secretKey string, crossAccountRoleArn string, externalId string) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	authFlag, clientAuth, err := authenticate.AuthenticateData("", "", "", region, accesskey, secretKey, crossAccountRoleArn, externalId)
-	return GetDiscoveredResource(authFlag, clientAuth, err)
+	return GetDiscoveredResourceByFlagAndClientAuth(authFlag, clientAuth, err)
 }
 
-func GetDiscoveredResource(authFlag bool, clientAuth *client.Auth, err error) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+func GetDiscoveredResourceByFlagAndClientAuth(authFlag bool, clientAuth *client.Auth, err error) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -32,6 +32,14 @@ func GetDiscoveredResource(authFlag bool, clientAuth *client.Auth, err error) (*
 		log.Println(err.Error())
 		return nil, err
 	}
+	return response, nil
+}
 
+func GetDiscoveredResourceByClientAuth(clientAuth *client.Auth) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+	response, err := appconfigcmd.GetDiscoveredResourceCounts(*clientAuth)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
 	return response, nil
 }
