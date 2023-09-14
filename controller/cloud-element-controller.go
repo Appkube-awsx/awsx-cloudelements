@@ -27,7 +27,7 @@ func GetDiscoveredResourceByFlagAndClientAuth(authFlag bool, clientAuth *client.
 		log.Println(err.Error())
 		return nil, err
 	}
-	response, err := appconfigcmd.GetDiscoveredResourceCounts(*clientAuth)
+	response, err := GetDiscoveredResource(clientAuth)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -35,7 +35,7 @@ func GetDiscoveredResourceByFlagAndClientAuth(authFlag bool, clientAuth *client.
 	return response, nil
 }
 
-func GetDiscoveredResourceByClientAuth(clientAuth *client.Auth) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+func GetDiscoveredResource(clientAuth *client.Auth) (*configservice.GetDiscoveredResourceCountsOutput, error) {
 	response, err := appconfigcmd.GetDiscoveredResourceCounts(*clientAuth)
 	if err != nil {
 		log.Println(err.Error())
